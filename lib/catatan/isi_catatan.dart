@@ -17,7 +17,7 @@ class IsiCatatan extends StatelessWidget {
           contentPadding: const EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
           border: InputBorder.none,
         ),
-        keyboardType: TextInputType.text,
+        keyboardType: TextInputType.multiline,
         maxLines: null,
         textInputAction: TextInputAction.newline,
       ),
