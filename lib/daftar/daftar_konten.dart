@@ -1,32 +1,29 @@
 import 'package:catatan_harian/daftar/daftar_catatan.dart';
+import 'package:catatan_harian/data.dart';
 import 'package:flutter/material.dart';
 
 class DaftarKonten extends StatelessWidget {
   DaftarKonten({
-    @required this.tanggalList,
-    @required this.judulList,
-    @required this.catatanList,
+    @required this.snapshot,
     @required this.hapusCatatan,
     @required this.ubahCatatan,
     @required this.tambahCatatan,
   });
-  final List<String> tanggalList;
-  final List<String> judulList;
-  final List<String> catatanList;
+  final AsyncSnapshot<List<ListCatatan>> snapshot;
   final Function(int) hapusCatatan;
-  final Function(int) ubahCatatan;
+  final Function(int, String, String, String) ubahCatatan;
   final Function tambahCatatan;
 
-  Future dialogHapus(BuildContext context, int index) {
+  Future dialogHapus(BuildContext context, String judul, int id) {
     return showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(
-          'Yakin "${judulList[index]}" akan dihapus?',
+          'Yakin "$judul" akan dihapus?',
           style: TextStyle(fontSize: 12),
         ),
         content: InkWell(
-          onTap: () => hapusCatatan(index),
+          onTap: () => hapusCatatan(id),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -58,20 +55,28 @@ class DaftarKonten extends StatelessWidget {
         child: Container(
           child: ListView.builder(
             physics: const ClampingScrollPhysics(),
-            itemCount: tanggalList.length,
+            itemCount: snapshot.data.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: InkWell(
-                  onLongPress: () => dialogHapus(context, index),
-                  onTap: () => ubahCatatan(index),
+                  onLongPress: () => dialogHapus(
+                    context,
+                    snapshot.data[index].judul,
+                    snapshot.data[index].id,
+                  ),
+                  onTap: () => ubahCatatan(
+                    snapshot.data[index].id,
+                    snapshot.data[index].tanggal,
+                    snapshot.data[index].judul,
+                    snapshot.data[index].catatan,
+                  ),
                   child: Column(
                     children: <Widget>[
                       DaftarCatatan(
-                        index: index,
-                        tanggalList: tanggalList,
-                        judulList: judulList,
-                        catatanList: catatanList,
+                        tanggal: snapshot.data[index].tanggal,
+                        judul: snapshot.data[index].judul,
+                        catatan: snapshot.data[index].catatan,
                       ),
                       Divider(height: 1),
                     ],

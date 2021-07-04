@@ -1,71 +1,93 @@
+import 'dart:convert';
+import 'package:catatan_harian/bantuan.dart';
 import 'package:catatan_harian/catatan/isi_catatan.dart';
 import 'package:catatan_harian/catatan/judul_catatan.dart';
 import 'package:catatan_harian/catatan/simpan_catatan.dart';
 import 'package:catatan_harian/catatan/tanggal_catatan.dart';
+import 'package:catatan_harian/endpoint.dart';
 import 'package:flutter/material.dart';
-import 'package:catatan_harian/fungsi_olah_data.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:http/http.dart' as http;
 
 class Catatan extends StatefulWidget {
   Catatan({
-    this.idList,
-    @required this.tanggalList,
-    @required this.judulList,
-    @required this.catatanList,
+    this.id,
+    @required this.tanggal,
+    @required this.judul,
+    @required this.catatan,
   });
-  final int idList;
-  final List<String> tanggalList;
-  final List<String> judulList;
-  final List<String> catatanList;
+  final int id;
+  final String tanggal;
+  final String judul;
+  final String catatan;
 
   @override
-  _CatatanState createState() => _CatatanState(
-      idList: idList,
-      tanggalList: tanggalList,
-      judulList: judulList,
-      catatanList: catatanList);
+  _CatatanState createState() =>
+      _CatatanState(id: id, tanggal: tanggal, judul: judul, catatan: catatan);
 }
 
 class _CatatanState extends State<Catatan> {
   _CatatanState({
-    this.idList,
-    @required this.tanggalList,
-    @required this.judulList,
-    @required this.catatanList,
+    this.id,
+    @required this.tanggal,
+    @required this.judul,
+    @required this.catatan,
   });
 
-  int idList;
-  List<String> tanggalList;
-  List<String> judulList;
-  List<String> catatanList;
+  int id;
+  String tanggal;
+  String judul;
+  String catatan;
 
   TextEditingController judulController = TextEditingController();
   TextEditingController catatanController = TextEditingController();
 
-  void onPressedSimpan() {
-    if (idList != null) {
-      judulList[idList] = judulController.text;
-      catatanList[idList] = catatanController.text;
+  Future<void> onPressedSimpan() async {
+    if (id != null) {
+      judul = judulController.text;
+      catatan = catatanController.text;
+
+      final response = await http.post(
+        Uri.parse('$UBAH_CATATAN'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'id': id.toString(),
+          'tanggal': tanggal,
+          'judul': judul,
+          'catatan': catatan
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.pop(context, 'berhasil');
+      } else {
+        throw Exception('Gagal untuk mengubah catatan');
+      }
     } else {
-      if (tanggalList == null) tanggalList = [];
-      String tanggalCatatan = DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(DateTime.now());
-      String jamCatatan = DateFormat('hh:mm:ss', 'id_ID').format(DateTime.now());
-      tanggalList.add('$tanggalCatatan jam $jamCatatan');
+      String judul = judulController.text;
+      String catatan = catatanController.text;
 
-      if (judulList == null) judulList = [];
-      judulList.add(judulController.text);
+      final response = await http.post(
+        Uri.parse('$TAMBAH_CATATAN'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'tanggal': formatDateYMDFromDateTime(DateTime.now()),
+          'judul': judul,
+          'catatan': catatan
+        }),
+      );
 
-      if (catatanList == null) catatanList = [];
-      catatanList.add(catatanController.text);
+      if (response.statusCode == 200) {
+        Navigator.pop(context, 'berhasil');
+      } else {
+        throw Exception('Gagal untuk menyimpan catatan');
+      }
     }
-
-    if (judulController.text.isNotEmpty) {
-      simpanData('dataTanggal', tanggalList);
-      simpanData('dataJudul', judulList);
-      simpanData('dataCatatan', catatanList);
-    }
-    Navigator.pop(context, 'berhasil');
   }
 
   @override
@@ -75,14 +97,14 @@ class _CatatanState extends State<Catatan> {
       DateFormat.Hm(locale);
     });
 
-    if (idList != null) {
-      judulController.text = judulList[idList];
-      catatanController.text = catatanList[idList];
+    if (id != null) {
+      judulController.text = judul;
+      catatanController.text = catatan;
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(idList == null ? 'Tambah Catatan' : 'Ubah Catatan'),
+        title: Text(id == null ? 'Tambah Catatan' : 'Ubah Catatan'),
         backgroundColor: Color(0xFF1761a0),
       ),
       body: Builder(
@@ -98,8 +120,8 @@ class _CatatanState extends State<Catatan> {
                       children: <Widget>[
                         SizedBox(height: 10),
                         TanggalCatatan(
-                          idList: idList,
-                          tanggalList: tanggalList,
+                          id: id,
+                          tanggal: tanggal,
                         ),
                         JudulCatatan(judulController: judulController),
                         Divider(height: 1),

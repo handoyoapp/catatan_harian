@@ -3,18 +3,16 @@ import 'package:share/share.dart';
 
 class DaftarCatatan extends StatelessWidget {
   DaftarCatatan({
-    @required this.index,
-    @required this.tanggalList,
-    @required this.judulList,
-    @required this.catatanList,
+    @required this.tanggal,
+    @required this.judul,
+    @required this.catatan,
   });
-  final int index;
-  final List<String> tanggalList;
-  final List<String> judulList;
-  final List<String> catatanList;
+  final String tanggal;
+  final String judul;
+  final String catatan;
 
-  void bagikanCatatan(int index) {
-    Share.share( '${tanggalList[index]}\n${judulList[index]}\n${catatanList[index]}');
+  void bagikanCatatan() {
+    Share.share( '$tanggal\n$judul\n$catatan');
   }
 
   @override
@@ -27,12 +25,12 @@ class DaftarCatatan extends StatelessWidget {
             children: <Widget>[
               SizedBox(height: 10),
               Text(
-                '${tanggalList[index]}',
+                '$tanggal',
                 style: TextStyle(color: Colors.grey, fontSize: 10),
               ),
               SizedBox(height: 3),
               Text(
-                '${judulList[index]}',
+                '$judul',
                 style: TextStyle(
                   color: Colors.grey[800],
                   fontWeight: FontWeight.bold,
@@ -41,7 +39,7 @@ class DaftarCatatan extends StatelessWidget {
               ),
               SizedBox(height: 5),
               Text(
-                '${catatanList[index]}',
+                '$catatan',
                 style: TextStyle(color: Colors.grey[700], fontSize: 14),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -51,7 +49,7 @@ class DaftarCatatan extends StatelessWidget {
           ),
         ),
         InkWell(
-          onTap: () => bagikanCatatan(index),
+          onTap: () => bagikanCatatan(),
           child: Icon(
             Icons.share,
             color: Colors.grey[350],
