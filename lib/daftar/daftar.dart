@@ -52,7 +52,7 @@ class _DaftarState extends State<Daftar> {
   }
 
   Future<void> hapusCatatan(int id) async {
-    final response = await http.get('$HAPUS_CATATAN?id=$id');
+    final response = await http.get(Uri.parse('$HAPUS_CATATAN?id=$id'));
     if (response.statusCode == 200) {
     } else {
       throw Exception('Gagal Menghapus Catatan');
@@ -64,7 +64,8 @@ class _DaftarState extends State<Daftar> {
   }
 
   Future<List<ListCatatan>> fetchDaftarCatatan() async {
-    final response = await http.get('$DAFTAR_CATATAN');
+    final response = await http.get(Uri.parse('$DAFTAR_CATATAN'));
+    
     if (response.statusCode == 200) {
       if (response.body != 'false') {
         Map<String, dynamic> json = jsonDecode(response.body);
