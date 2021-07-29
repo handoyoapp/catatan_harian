@@ -1,4 +1,4 @@
-# catatan_harian
+# Catatan Harian (Android dan Web (PWA))
 Source Code Membuat Aplikasi Android sampai Rilis di Play Store.
 
 ## Sort Update
